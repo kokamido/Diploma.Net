@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,12 +13,9 @@ namespace Math_.net_Core.Math
 {
     public class Program
     {
-        private static readonly log4net.ILog log =
-            log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static string resFolder;
-        private static double totalToProcess;
-        private static int totalProcessed;
 
         private static int DegreeOfParallelism()
         {
@@ -41,24 +39,30 @@ namespace Math_.net_Core.Math
                 throw new ArgumentException("set mode and config");
 
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-            XmlConfigurator.Configure(logRepository, new FileInfo(Path.Combine(Directory.GetCurrentDirectory(),"log4net.config")));
+            XmlConfigurator.Configure(logRepository,
+                new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), "log4net.config")));
 
             switch (args[0])
             {
                 case "auto":
-                    AutoMode();
+                    AutoMode(args);
                     break;
-                case "interactive":
-                    InteractiveMode(args.Skip(1).ToArray());
+                case "onerun":
+                    OneRunMode(args);
                     break;
             }
         }
 
-        private static void InteractiveMode(string[] args)
+        private static void OneRunMode(string[] args)
         {
+            log.Info("Start one run mode");
+            resFolder = $"res{DateTime.Now:dd.MM.yyyyThh_mm_ss}";
+            if (!Directory.Exists(resFolder))
+                Directory.CreateDirectory(resFolder);
+            new Experiment(args[2], args[3]).RunWithConfig(Config.FromJson(File.ReadAllText(args[1])));
         }
 
-        private static void AutoMode()
+        private static void AutoMode(string[] args)
         {
             try
             {
@@ -66,15 +70,17 @@ namespace Math_.net_Core.Math
                 resFolder = $"res{DateTime.Now:dd.MM.yyyyThh_mm_ss}";
                 if (!Directory.Exists(resFolder))
                     Directory.CreateDirectory(resFolder);
-                var confs = Enumerable.Range(1, 20)
+                Config[] confs = null;
+
+                confs = Enumerable.Range(1, 20)
                     .Select(n => n / 2.0)
                     .Populate(ConfigHelper.Default, (p, c) => c.InitStateConfig.Picks = p)
                     .SelectMany(c =>
                         new[] {StartProfile.Cos, StartProfile.CosReverse}.Populate(c,
                             (p, conf) => conf.InitStateConfig.ProfileType = p))
-                    .SelectMany(c => new[] {0.0, 0.0005, 0.001}.Populate(c, (n, conf) => conf.NoiseAmp = n))
+                    .SelectMany(c => new[] {0.0, 0.00005, 0.0001 /*0.001*/}.Populate(c, (n, conf) => conf.NoiseAmp = n))
                     .SelectMany(c =>
-                        Enumerable.Range(28, 22).Select(n => n / 2.0).Populate(c, (du, conf) => conf.Du = du))
+                        Enumerable.Range(30, 20).Select(n => n / 2.0).Populate(c, (du, conf) => conf.Du = du))
                     .Select(c =>
                     {
                         c.ApplyInitStateConfig();
@@ -90,7 +96,7 @@ namespace Math_.net_Core.Math
                                 cn.NoiseAmp /= 4.0;
                                 cn.TimeQuant = 0.001 / 4;
                                 cn.ItersNum = 2000000 * 4;
-                                cn.TimeLineQuant = 400;
+                                cn.TimeLineQuant = 100;
                             }
                             else
                             {
@@ -121,71 +127,14 @@ namespace Math_.net_Core.Math
                     .Select(c => c.GetModifiedCopy(cn => cn.Id = MathHelper.GetRandomInt()))
                     .OrderBy(c => c.InitStateConfig.Integrator == IntegratorType.Rk ? 0 : 1)
                     .ToArray();
-                foreach (var c in confs)
-                {
-                    log.Info(c.ToString());
-                }
 
-                log.Info($"Total tasks {confs.Length}");
 
-                totalToProcess = confs.Length;
-                confs.Select(c =>
-                    {
-                        log.Info(JsonConvert.SerializeObject(c.InitStateConfig));
-                        return Start(c);
-                    })
-                    .AsParallel()
-                    .AsOrdered()
-                    .WithDegreeOfParallelism(6)
-                    .ForAll(t => t.RunSynchronously());
+                new Experiment(args[1], args[2]).RunWithConfig(confs, int.Parse(args[3]));
             }
             catch (Exception e)
             {
                 log.Fatal(e);
             }
-        }
-
-        public static Task Start(Config config)
-        {
-            Integrator integrator;
-            switch (config.InitStateConfig.Integrator)
-            {
-                case IntegratorType.Rk:
-                    integrator = new RkMethod();
-                    break;
-                case IntegratorType.Net:
-                    integrator = new NetMethod();
-                    break;
-                default:
-                    integrator = new RkMethod();
-                    break;
-            }
-
-            return new Task(() =>
-                {
-                    try
-                    {
-                        log.Info($"Start {config}");
-                        var i = Interlocked.Increment(ref totalProcessed);
-                        log.Info(i / totalToProcess);
-                        double[] resU;
-                        double[] resV;
-                        var res = integrator.EvaluateAuto(config, out resU, out resV);
-                        var kek = new Result
-                        {
-                            Config = config,
-                            FinalU = resU,
-                            FinalV = resV,
-                            TimeLine = res
-                        };
-                        kek.Serialize(resFolder);
-                    }
-                    catch (Exception e)
-                    {
-                        log.Fatal(e);
-                    }
-                }
-            );
         }
     }
 }

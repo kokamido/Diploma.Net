@@ -92,15 +92,17 @@ namespace Math_.net_Core.Math
         public static double GetFourierCoeffCos(int k, double range, double[] func)
         {
             var step = range / func.Length;
-            var forInt = GetInitState(StartProfile.Cos, k, 1, 0, range, step)
-                .Zip(func,(fst,snd)=>fst*snd).ToArray();
+            var forInt = k > 0
+                ? GetInitState(StartProfile.Cos, k, 1, 0, range, step).Zip(func, (fst, snd) => fst * snd).ToArray()
+                : func;
             return IntSimpson(forInt, step)/System.Math.PI;
         }
         public static double GetFourierCoeffSin(int k, double range, double[] func)
         {
             var step = range / func.Length;
-            var forInt = GetInitState(StartProfile.Sin, k, 1, 0, range, step)
-                .Zip(func,(fst,snd)=>fst*snd).ToArray();
+            var forInt = k > 0
+                ? GetInitState(StartProfile.Sin, k, 1, 0, range, step).Zip(func, (fst, snd) => fst * snd).ToArray()
+                : func;
             return IntSimpson(forInt, step)/System.Math.PI;
         }
     }

@@ -6,41 +6,6 @@ using Newtonsoft.Json;
 
 namespace Math_.net_Core.Math
 {
-    public static class ConfigHelper
-    {
-        public static Config Default => new Config
-        {
-            Du = 2,
-            Dv = 1,
-            p = 2,
-            q = 2,
-            SpaceRange = 40,
-            SpaceQuant = 0.2,
-            TimeQuant = 0.01,
-            NoiseAmp = 0,
-            ItersNum = 2000000,
-            TimeLineQuant = 100,
-            InitStateConfig = new InitStateConfig
-            {
-                ProfileType = StartProfile.Cos,
-                Avg = 1,
-                Amp = 0.5,
-                Picks = 2.5,
-                Integrator = IntegratorType.Rk
-            }
-        };
-
-        public static IEnumerable<Config> Populate<T>(this IEnumerable<T> args, Config config, Action<T, Config> func)
-        {
-            return args.Select(a =>
-            {
-                var buf = config.GetModifiedCopy();
-                func(a, buf);
-                return buf;
-            });
-        }
-    }
-
     public class Result
     {
         public Config Config;
@@ -144,18 +109,7 @@ namespace Math_.net_Core.Math
             return copy;
         }
 
-        public Config()
-        {
-        }
-
-        public static Config FromJson(string json)
-        {
-            var a = JsonConvert.DeserializeObject<Config>(json);
-            Console.WriteLine(a);
-            return new Config(MathHelper.GetRandomInt(), a.InitStateConfig, a.Du, a.Dv, a.p, a.q, a.SpaceQuant,
-                a.SpaceRange,
-                a.TimeQuant, a.NoiseAmp, a.ItersNum, a.TimeLineQuant);
-        }
+        public Config(){}
 
         public Config(int id, double[] initStateU, double[] initStateV, double du, double dv, double p, double q,
             double spaceQuant, double spaceRange, double timeQuant, double noiseAmp, int itersNum, int timeLineQuant)
@@ -175,6 +129,15 @@ namespace Math_.net_Core.Math
             NoiseAmp = noiseAmp;
             ItersNum = itersNum;
             TimeLineQuant = timeLineQuant;
+        }
+        
+        public static Config FromJson(string json)
+        {
+            var a = JsonConvert.DeserializeObject<Config>(json);
+            Console.WriteLine(a);
+            return new Config(MathHelper.GetRandomInt(), a.InitStateConfig, a.Du, a.Dv, a.p, a.q, a.SpaceQuant,
+                a.SpaceRange,
+                a.TimeQuant, a.NoiseAmp, a.ItersNum, a.TimeLineQuant);
         }
 
         public void ApplyInitStateConfig()

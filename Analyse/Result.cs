@@ -13,7 +13,7 @@ namespace Analyse
     public class Result
     {
         private static readonly ILog Log;
-        private static int koeffsCount = 25;
+        private static int koeffsCount = 31;
         private static Config config;
         private static double[,] timeLine;
 
@@ -71,7 +71,7 @@ namespace Analyse
             {
                 var l0 = fourierCoeffsCos.GetLength(0);
                 var l1 = fourierCoeffsCos.GetLength(1);
-                for (int j = 1; j <= l1; j++)
+                for (int j = 0; j <= l1; j++)
                 {
                     
                     outp.Write("cos");
@@ -122,10 +122,10 @@ namespace Analyse
                     timeLine[i, j] = nums[j];
                 }
 
-                for (int k = 1; k <= koeffsCount; k++)
+                for (int k = 0; k < koeffsCount; k++)
                 {
-                    fourierCoeffsCos[i, k-1] = MathHelper.GetFourierCoeffCos(k, config.SpaceRange, nums);
-                    fourierCoeffsSin[i, k-1] = MathHelper.GetFourierCoeffSin(k, config.SpaceRange, nums);
+                    fourierCoeffsCos[i, k] = MathHelper.GetFourierCoeffCos(k, config.SpaceRange, nums);
+                    fourierCoeffsSin[i, k] = MathHelper.GetFourierCoeffSin(k, config.SpaceRange, nums);
                 }
             }    
         }
