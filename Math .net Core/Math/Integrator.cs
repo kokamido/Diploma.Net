@@ -79,7 +79,7 @@ namespace Math_.net_Core.Math
                     Array.Copy(U1, U0, U0.Length);
                     Array.Copy(V1, V0, V0.Length);
                     if (i % config.TimeLineQuant == 0)
-                        evaluation[i / config.TimeLineQuant] = U0;
+                        evaluation[i/config.TimeLineQuant]=U0;
                 }
 
                 Log.Info($"End calculating {GetName()} {config}");
@@ -107,13 +107,13 @@ namespace Math_.net_Core.Math
         public override double[][] EvaluateAuto(Config config, out double[] resultU, out double[] resultV)
         {
             try
-            {
-                double[][] evaluation = new double[config.ItersNum / config.TimeLineQuant + 1][];
+            {    
                 int length = config.InitStateU.Length;
                 var U0 = config.InitStateU;
                 var V0 = config.InitStateV;
                 var U1 = new double[length];
                 var V1 = new double[length];
+                double[][] evaluation = new double[config.ItersNum / config.TimeLineQuant + 1][];
                 var kok = config.ItersNum / 10;
                 for (int i = 0; i < config.ItersNum; ++i)
                 {
@@ -152,7 +152,7 @@ namespace Math_.net_Core.Math
                     V0 = V1;
                     V1 = new double[length];
                     if (i % config.TimeLineQuant == 0)
-                        evaluation[i / config.TimeLineQuant] = U0;
+                        evaluation[i/config.TimeLineQuant] = U0;
                 }
 
                 Log.Info($"End calculating {GetName()} {config}");

@@ -6,6 +6,7 @@ using System.Reflection;
 using log4net;
 using log4net.Config;
 using Math_.net_Core.Math;
+using Newtonsoft.Json;
 
 namespace Analyse
 {
@@ -20,7 +21,7 @@ namespace Analyse
             var files = Directory.GetFiles(inputFolder).ToArray();
             Console.WriteLine($"{inputFolder} | {outputFolder}");
             foreach (var id in new HashSet<string>(files.Select(f => f.Split(';')[0])))
-            {  
+            {
                 var metaAndData = files.Where(f => f.StartsWith(id)).OrderBy(x => x).ToArray();
                 Result.Calc(metaAndData.First(s => s.EndsWith("_meta")),
                     metaAndData.First(s => s.EndsWith("_data")), 

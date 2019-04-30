@@ -133,19 +133,17 @@ namespace Math_.net_Core.Math
         
         public static Config FromJson(string json)
         {
-            var a = JsonConvert.DeserializeObject<Config>(json);
-            Console.WriteLine(a);
-            return new Config(MathHelper.GetRandomInt(), a.InitStateConfig, a.Du, a.Dv, a.p, a.q, a.SpaceQuant,
-                a.SpaceRange,
-                a.TimeQuant, a.NoiseAmp, a.ItersNum, a.TimeLineQuant);
+            return JsonConvert.DeserializeObject<Config>(json);
         }
 
-        public void ApplyInitStateConfig()
+        public Config ApplyInitStateConfig()
         {
+            Id = MathHelper.GetRandomInt();
             InitStateU = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
                 InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
             InitStateV = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
                 InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
+            return this;
         }
 
         public Config(int id, string initStateUPath, string initStateVPath, double du, double dv, double p, double q,

@@ -12,25 +12,14 @@ namespace Math_.net_Core.Math
 {
     public class Experiment
     {
-        public readonly string ConfigFolder;
         public readonly string OutFolder;
         
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private int totalProcessed;
         private int totalToProcess;
 
-        public Experiment(string configFolder, string outFolder)
+        public Experiment(string outFolder)
         {
-            if (Directory.Exists(configFolder))
-            {
-                log.Info($"Config folder '{configFolder}' is already exists and contains {Directory.GetFiles(configFolder).Length} files");
-            }
-            else
-            {
-                Directory.CreateDirectory(configFolder);
-                log.Info($"Config folder '{configFolder}' has been created");
-            }
-            
             if (Directory.Exists(outFolder))
             {
                 log.Info($"Out folder '{outFolder}' is already exists and contains {Directory.GetFiles(outFolder).Length} files");
@@ -41,7 +30,6 @@ namespace Math_.net_Core.Math
                 log.Info($"Config folder '{outFolder}' has been created");
             }
 
-            ConfigFolder = configFolder;
             OutFolder = outFolder;
         }
 
@@ -68,7 +56,7 @@ namespace Math_.net_Core.Math
                 })
                 .AsParallel()
                 .AsOrdered()
-                .WithDegreeOfParallelism(6)
+                .WithDegreeOfParallelism(degreeOfParalellism)
                 .ForAll(t => t.RunSynchronously());          
         }
 

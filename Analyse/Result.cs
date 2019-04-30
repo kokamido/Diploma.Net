@@ -74,10 +74,10 @@ namespace Analyse
                 for (int j = 0; j <= l1; j++)
                 {
                     
-                    outp.Write("cos");
-                    outp.Write(j);
-                    outp.Write(" sin");
-                    outp.Write(j);
+                    outp.Write("c");
+                    outp.Write(j/2.0);
+                    outp.Write(" s");
+                    outp.Write(j/2.0);
                     outp.Write(" ");
                 }
                 outp.WriteLine();
@@ -124,8 +124,8 @@ namespace Analyse
 
                 for (int k = 0; k < koeffsCount; k++)
                 {
-                    fourierCoeffsCos[i, k] = MathHelper.GetFourierCoeffCos(k, config.SpaceRange, nums);
-                    fourierCoeffsSin[i, k] = MathHelper.GetFourierCoeffSin(k, config.SpaceRange, nums);
+                    fourierCoeffsCos[i, k] = MathHelper.GetFourierCoeffCos(k/2.0, config.SpaceRange, nums);
+                    fourierCoeffsSin[i, k] = MathHelper.GetFourierCoeffSin(k/2.0, config.SpaceRange, nums);
                 }
             }    
         }

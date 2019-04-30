@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +51,24 @@ namespace Math_.net_Core.Math
                 case "onerun":
                     OneRunMode(args);
                     break;
+                case "multiplerun":
+                    MultipleRunMode(args);
+                    break;
             }
+        }
+        
+        private static void MultipleRunMode(string[] args)
+        {
+            log.Info("Start multiple run mode");
+            resFolder = $"res{DateTime.Now:dd.MM.yyyyThh_mm_ss}";
+            if (!Directory.Exists(resFolder))
+                Directory.CreateDirectory(resFolder);
+            var config = Config.FromJson(File.ReadAllText(args[1]));
+            var configs = Enumerable.Range(0, int.Parse(args[2]))
+                .Select(c => config.GetModifiedCopy())
+                .Select(c => c.ApplyInitStateConfig())
+                .ToArray();
+            new Experiment(args[4]).RunWithConfig(configs, int.Parse(args[3]));
         }
 
         private static void OneRunMode(string[] args)
@@ -59,7 +77,7 @@ namespace Math_.net_Core.Math
             resFolder = $"res{DateTime.Now:dd.MM.yyyyThh_mm_ss}";
             if (!Directory.Exists(resFolder))
                 Directory.CreateDirectory(resFolder);
-            new Experiment(args[2], args[3]).RunWithConfig(Config.FromJson(File.ReadAllText(args[1])));
+            new Experiment(args[2]).RunWithConfig(Config.FromJson(File.ReadAllText(args[1])));
         }
 
         private static void AutoMode(string[] args)
@@ -129,7 +147,7 @@ namespace Math_.net_Core.Math
                     .ToArray();
 
 
-                new Experiment(args[1], args[2]).RunWithConfig(confs, int.Parse(args[3]));
+                new Experiment(args[1]).RunWithConfig(confs, int.Parse(args[2]));
             }
             catch (Exception e)
             {

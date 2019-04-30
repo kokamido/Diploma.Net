@@ -89,7 +89,7 @@ namespace Math_.net_Core.Math
             return step / 6 * (f_x1 + 4 * f_x2 + f_x3);
         }
 
-        public static double GetFourierCoeffCos(int k, double range, double[] func)
+        public static double GetFourierCoeffCos(double k, double range, double[] func)
         {
             var step = range / func.Length;
             var forInt = k > 0
@@ -97,7 +97,7 @@ namespace Math_.net_Core.Math
                 : func;
             return IntSimpson(forInt, step)/System.Math.PI;
         }
-        public static double GetFourierCoeffSin(int k, double range, double[] func)
+        public static double GetFourierCoeffSin(double k, double range, double[] func)
         {
             var step = range / func.Length;
             var forInt = k > 0
