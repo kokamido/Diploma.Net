@@ -27,7 +27,7 @@ namespace Math_.net_Core.Math
             else
             {
                 Directory.CreateDirectory(outFolder);
-                log.Info($"Config folder '{outFolder}' has been created");
+                log.Info($"Out folder '{outFolder}' has been created");
             }
 
             OutFolder = outFolder;

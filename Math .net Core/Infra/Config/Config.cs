@@ -102,6 +102,7 @@ namespace Math_.net_Core.Math
             a.InitStateV = null;
             return JsonConvert.SerializeObject(a);
         }
+
         public Config GetModifiedCopy(Action<Config> a = null)
         {
             var copy = JsonConvert.DeserializeObject<Config>(JsonConvert.SerializeObject(this));
@@ -109,7 +110,9 @@ namespace Math_.net_Core.Math
             return copy;
         }
 
-        public Config(){}
+        public Config()
+        {
+        }
 
         public Config(int id, double[] initStateU, double[] initStateV, double du, double dv, double p, double q,
             double spaceQuant, double spaceRange, double timeQuant, double noiseAmp, int itersNum, int timeLineQuant)
@@ -130,7 +133,7 @@ namespace Math_.net_Core.Math
             ItersNum = itersNum;
             TimeLineQuant = timeLineQuant;
         }
-        
+
         public static Config FromJson(string json)
         {
             return JsonConvert.DeserializeObject<Config>(json);
@@ -139,10 +142,16 @@ namespace Math_.net_Core.Math
         public Config ApplyInitStateConfig()
         {
             Id = MathHelper.GetRandomInt();
-            InitStateU = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
-                InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
-            InitStateV = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
-                InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
+            if (InitStateU == null || InitStateU.Length==0)
+            {
+                InitStateU = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
+                    InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
+            }
+            if (InitStateV == null || InitStateV.Length==0)
+            {
+                InitStateV = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
+                    InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
+            }
             return this;
         }
 
