@@ -64,7 +64,7 @@ namespace Math_.net_Core.Math
                         {
                             if (double.IsNaN(t) || double.IsInfinity(t))
                             {
-                                Log.Error($"{GetName()} обосрался {config}");
+                                Log.Error($"{GetName()} messed up {config}");
                                 resultU = null;
                                 resultV = null;
                                 return null;
@@ -124,9 +124,9 @@ namespace Math_.net_Core.Math
                     for (int h = 1; h < length - 1; h++)
                     {
                         U1[h] = NewU(U0[h], V0[h], U0[h - 1], U0[h + 1], config.Du, config.SpaceQuant, config.TimeQuant,
-                            MathHelper.GaussRnd() * config.NoiseAmp);
+                            MathHelper.GaussRnd() * config.NoiseAmp*U0[h]);
                         V1[h] = NewV(U0[h], V0[h], V0[h - 1], V0[h + 1], config.Dv, config.p, config.q,
-                            config.SpaceQuant, config.TimeQuant, MathHelper.GaussRnd() * config.NoiseAmp);
+                            config.SpaceQuant, config.TimeQuant, MathHelper.GaussRnd() * config.NoiseAmp*V0[h]);
                     }
 
                     if (i % 5000 == 0)
@@ -135,7 +135,7 @@ namespace Math_.net_Core.Math
                         {
                             if (double.IsNaN(U1[kek]) || double.IsInfinity(U1[kek]))
                             {
-                                Log.Error($"{GetName()} обосрался {config}");
+                                Log.Error($"{GetName()} messed up {config}");
                                 resultU = null;
                                 resultV = null;
                                 return null;
