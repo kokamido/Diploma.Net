@@ -66,7 +66,8 @@ namespace Math_.net_Core.Math
     public class InitStateConfig
     {
         public StartProfile ProfileType;
-        public double Avg;
+        public double AvgU;
+        public double AvgV;
         public double Amp;
         public double Picks;
         public IntegratorType Integrator;
@@ -83,10 +84,7 @@ namespace Math_.net_Core.Math
         public int Id;
         public double[] InitStateU;
         public double[] InitStateV;
-        public double Du;
-        public double Dv;
-        public double p;
-        public double q;
+        public Dictionary<string, double> Parameters;
         public double SpaceQuant;
         public double SpaceRange;
         public double TimeQuant;
@@ -110,30 +108,6 @@ namespace Math_.net_Core.Math
             return copy;
         }
 
-        public Config()
-        {
-        }
-
-        public Config(int id, double[] initStateU, double[] initStateV, double du, double dv, double p, double q,
-            double spaceQuant, double spaceRange, double timeQuant, double noiseAmp, int itersNum, int timeLineQuant)
-        {
-            if (initStateU.Length != initStateV.Length)
-                throw new ArgumentException("Зачем разной длины массивы подал??");
-            Id = id;
-            InitStateU = initStateU;
-            InitStateV = initStateV;
-            Du = du;
-            Dv = dv;
-            this.p = p;
-            this.q = q;
-            SpaceQuant = spaceQuant;
-            SpaceRange = spaceRange;
-            TimeQuant = timeQuant;
-            NoiseAmp = noiseAmp;
-            ItersNum = itersNum;
-            TimeLineQuant = timeLineQuant;
-        }
-
         public static Config FromJson(string json)
         {
             return JsonConvert.DeserializeObject<Config>(json);
@@ -145,53 +119,14 @@ namespace Math_.net_Core.Math
             if (InitStateU == null || InitStateU.Length==0)
             {
                 InitStateU = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
-                    InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
+                    InitStateConfig.Amp, InitStateConfig.AvgU, SpaceRange, SpaceQuant);
             }
             if (InitStateV == null || InitStateV.Length==0)
             {
                 InitStateV = MathHelper.GetInitState(InitStateConfig.ProfileType, InitStateConfig.Picks,
-                    InitStateConfig.Amp, InitStateConfig.Avg, SpaceRange, SpaceQuant);
+                    InitStateConfig.Amp, InitStateConfig.AvgV, SpaceRange, SpaceQuant);
             }
             return this;
-        }
-
-        public Config(int id, string initStateUPath, string initStateVPath, double du, double dv, double p, double q,
-            double spaceQuant, double spaceRange, double timeQuant, double noiseAmp, int itersNum, int timeLineQuant)
-        {
-            Id = id;
-            InitStateU = GetDataFromFile(initStateUPath);
-            InitStateV = GetDataFromFile(initStateVPath);
-            Du = du;
-            Dv = dv;
-            this.p = p;
-            this.q = q;
-            SpaceQuant = spaceQuant;
-            SpaceRange = spaceRange;
-            TimeQuant = timeQuant;
-            NoiseAmp = noiseAmp;
-            ItersNum = itersNum;
-            TimeLineQuant = timeLineQuant;
-            if (InitStateU.Length != InitStateV.Length)
-                throw new ArgumentException("Зачем разной длины массивы подал??");
-        }
-
-        private Config(int id, InitStateConfig initStateConfig,
-            double du, double dv, double p, double q, double spaceQuant, double spaceRange, double timeQuant,
-            double noiseAmp, int itersNum, int timeLineQuant)
-        {
-            InitStateConfig = initStateConfig;
-            ApplyInitStateConfig();
-            Id = id;
-            Du = du;
-            Dv = dv;
-            this.p = p;
-            this.q = q;
-            SpaceQuant = spaceQuant;
-            SpaceRange = spaceRange;
-            TimeQuant = timeQuant;
-            NoiseAmp = noiseAmp;
-            ItersNum = itersNum;
-            TimeLineQuant = timeLineQuant;
         }
 
         [JsonIgnore] public string Filename => $"{Id}; {DateTime.Now:yyyy-MM-ddThh_mm_ss_fff}";

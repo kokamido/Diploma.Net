@@ -13,7 +13,7 @@ namespace Math_.net_Core.Math
     public class Experiment
     {
         public readonly string OutFolder;
-        
+
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private int totalProcessed;
         private int totalToProcess;
@@ -35,9 +35,9 @@ namespace Math_.net_Core.Math
 
         public void Run()
         {
-            
+
         }
-        
+
         public void RunWithConfig(Config[] configs, int degreeOfParalellism)
         {
             foreach (var c in configs)
@@ -45,10 +45,10 @@ namespace Math_.net_Core.Math
                 c.ApplyInitStateConfig();
                 log.Info(c.ToString());
             }
-            
+
             totalToProcess = configs.Length;
             log.Info($"Total tasks {totalToProcess}");
-            
+
             configs.Select(c =>
                 {
                     log.Info(JsonConvert.SerializeObject(c.InitStateConfig));
@@ -57,7 +57,7 @@ namespace Math_.net_Core.Math
                 .AsParallel()
                 .AsOrdered()
                 .WithDegreeOfParallelism(degreeOfParalellism)
-                .ForAll(t => t.RunSynchronously());          
+                .ForAll(t => t.RunSynchronously());
         }
 
         public Task RunWithConfig(Config config)
@@ -71,6 +71,9 @@ namespace Math_.net_Core.Math
                     break;
                 case IntegratorType.Net:
                     integrator = new NetMethod();
+                    break;
+                case IntegratorType.Azis:
+                    integrator = new AzisIтtegrator();
                     break;
                 default:
                     integrator = new RkMethod();

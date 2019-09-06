@@ -21,7 +21,8 @@ namespace Math_.net_Core.Math
     {
         None,
         Rk,
-        Net
+        Net,
+        Azis
     }
 
     public class NetMethod : Integrator
@@ -37,11 +38,11 @@ namespace Math_.net_Core.Math
                 var V1 = new double[length];
                 double[][] evaluation = new double[config.ItersNum / config.TimeLineQuant + 1][];
                 double sq2 = config.SpaceQuant * config.SpaceQuant;
-                double Du = config.Du;
-                double Dv = config.Dv;
-                double q = config.q;
-                double qPlus1 = config.q + 1;
-                double p = config.p;
+                double Du = config.Parameters["Du"];
+                double Dv = config.Parameters["Dv"];
+                double p = config.Parameters["p"];;
+                double q = config.Parameters["q"];
+                double qPlus1 = q + 1;
                 double tq = config.TimeQuant;
                 double nAmp = config.NoiseAmp;
                 for (int i = 0; i < config.ItersNum; ++i)
@@ -107,12 +108,16 @@ namespace Math_.net_Core.Math
         public override double[][] EvaluateAuto(Config config, out double[] resultU, out double[] resultV)
         {
             try
-            {    
+            {
                 int length = config.InitStateU.Length;
                 var U0 = config.InitStateU;
                 var V0 = config.InitStateV;
                 var U1 = new double[length];
                 var V1 = new double[length];
+                double Du = config.Parameters["Du"];
+                double Dv = config.Parameters["Dv"];
+                double p = config.Parameters["p"];
+                double q = config.Parameters["q"];
                 double[][] evaluation = new double[config.ItersNum / config.TimeLineQuant + 1][];
                 var kok = config.ItersNum / 10;
                 for (int i = 0; i < config.ItersNum; ++i)
@@ -123,9 +128,9 @@ namespace Math_.net_Core.Math
 
                     for (int h = 1; h < length - 1; h++)
                     {
-                        U1[h] = NewU(U0[h], V0[h], U0[h - 1], U0[h + 1], config.Du, config.SpaceQuant, config.TimeQuant,
+                        U1[h] = NewU(U0[h], V0[h], U0[h - 1], U0[h + 1], Du, config.SpaceQuant, config.TimeQuant,
                             MathHelper.GaussRnd() * config.NoiseAmp*U0[h]);
-                        V1[h] = NewV(U0[h], V0[h], V0[h - 1], V0[h + 1], config.Dv, config.p, config.q,
+                        V1[h] = NewV(U0[h], V0[h], V0[h - 1], V0[h + 1], Dv, p, q,
                             config.SpaceQuant, config.TimeQuant, MathHelper.GaussRnd() * config.NoiseAmp*V0[h]);
                     }
 
